@@ -1,3 +1,45 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext_lazy as _gtl
 
-# Register your models here.
+from core import models
+
+
+class UserAdmin(BaseUserAdmin):
+    ordering = ['id'] # ordering by id
+    list_display = ['email', 'name'] # admin can only see the users these infortmaions
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        (
+            _gtl('Permissions'),
+            {
+                'fields':(
+                    'is_active',
+                    'is_staff',
+                    'is_superuser'
+                )
+            }
+        ),
+        (_gtl('Important dates'), {'fields': ('last_login',)}),
+    )
+
+    readonly_fields = ['last_login']
+    add_fieldsets = (
+        (None,{
+            'classes': ('wide',),
+            'fields': (
+                'email',
+                'password1',
+                'password2',
+                'name',
+                'is_active',
+                'is_staff',
+                'is_superuser',
+            )
+        }),
+    )
+
+admin.site.register(models.User, UserAdmin)
+admin.site.register(models.Team)
+admin.site.register(models.Aircraft)
+admin.site.register(models.Part)
